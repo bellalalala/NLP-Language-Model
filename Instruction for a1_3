@@ -1,0 +1,80 @@
+Instruction for a1_3
+
+There are total 4 parts of this code, including a Data Preprocssing part. User must run Data Processing part before running any other part.
+
+3.0  Data Preprocessing
+
+Change the direction in glob.glob() to your own direction where you put all the unzipped training file. The 1st and 2nd cell will generate a new combined file without space line.
+
+All the codes after should be run on the newly generated file. 
+
+Run all the code along to read file, remove punctuations, remove \n and multiple spaces to get the cleaned input data. 
+
+Count function is defined and you will get the initial counts used to replace the rare characters.
+After replacing characters that appears <=5 as "*", we get the data ready to use.
+
+
+3.1  unigram, bigram, and trigram character counts
+
+This part should be run on the preprocessed data.
+ngram_generate function is defined to generate ngrams. This part generates bigrams and trigrams, and gives all the counts for unigrams, bigrams and trigrams. Output files will be on the same direction as the pynb.
+
+
+
+3.2 search best lambda combination and calculate perplexity using interpolation method
+
+Preprocessing tr_set and hd_set
+
+Use all training data and split them by sentence to get 80% new training set and held out set. Perform the same preprocessing to them.
+
+Count characters based on new training set and replace rare characters to '*'. Do the same to characters that are in hd_set but not in tr_set.
+
+Calculate probability on training set
+
+Functions are defined to calculate the probability for both unigrams and ngrams(n>=2).
+
+Generate ngrams and count ngrams on new training set and calculate the probability based on their counts on tr_set.
+
+Create lambda combinations
+
+36 lambda combinations are created in a list with 36 items. In each item of the list:
+the 1st lambda is for trigram, from 0.8 to 0.1;
+the 2nd lambda is for bigram, from 0.8 to 0.1;
+the 3rd lambda is for unigram, from 0.8 to 0.1;
+3 lambdas sum to 1.
+
+Calculate prob on held out set
+
+Trigrams from held out set are generated.
+
+For loop is to calculate the interpolation estimated probability of each trigram in hd_set for each lambda combination and get a list of dictionaries; each dictionary includes all the estimated probability for trigrams.
+
+The probability is calculated based on the previous calculated probabilities of ngrams in tr_set. For those trigrams not in tr_set, the probability is calculated based on its bigram and unigram (the same as p(tri)=0); For those trigrams not in tr_set, and the bigrams not in tr_set, the probability is calculated based on its unigram only (the same as p(tri)=p(bi)=0 and p(tri-hat) = lambda * p(uni) only)
+
+Log_probability of hd_set are calculated for each lambda combination and the one with max probability is the best lambda combination.
+
+Calculate probability on total training data
+
+Ngram probabilities are claculated on total training data for perplexity calculating on test set.
+
+Processing test data
+
+Do the same processing to test data. Need to change direction here.
+
+For each test file, calculate the estimated trigram prob and perplexity using the best lambda combination. (This step may cost several minites.)
+
+Report the perplexity and 50 files with largest perplexity. Output files will be in the same direction as pynb. 
+
+
+
+3.3 calculate perplexity using add_0.1 smoothing
+
+Calculate probability for all possible trigram using add_0.1 smoothing: 
+for occured trigrams:
+p(abc) = [c(abc)+0.1]/[c(ab)+0.1V]; 
+for trigrams not occured but its bigram occured:
+p(abc) = 0.1/[c(ab)+0.1V]; 
+for trigrams not occured whose bigram didn't occur:
+p(abc) = 0.1/0.1V = 1/v; 
+
+Calculate the perplexity for each test file, list 50 files with largest perp and report the result. Output files will be in the same direction as pynb. 
